@@ -14,17 +14,45 @@
 namespace py = pybind11;
 using namespace lob;
 
+struct PyLogger : public IEventLogger {
+  std::vector<py::dict> trades;
+
+  void log_new(const NewOrder &o, bool is_limit, Tick px_used,
+               Timestamp eff_ts) override {}
+  void log_fill(Tick px, Quantity qty, Side liquidity_side, OrderId passive_id,
+                OrderId taker_id, Timestamp ts) override {
+    py::dict d;
+    d["price"] = px;
+    d["qty"] = qty;
+    d["maker_id"] = passive_id;
+    d["taker_id"] = taker_id;
+    d["ts"] = ts;
+    d["liquidity_side"] = (liquidity_side == Side::Bid) ? "Bid" : "Ask";
+    trades.push_back(d);
+  }
+  void log_cancel(OrderId id, Timestamp ts) override {}
+};
+
 struct PyBook {
   PriceLevelsSparse bids;
   PriceLevelsSparse asks;
-  BookCore          core;
+  PyLogger logger;
+  BookCore core;
 
-  PyBook() : bids(), asks(), core(bids, asks, /*logger*/ nullptr) {}
+  PyBook() : bids(), asks(), logger(), core(bids, asks, &logger) {}
 
-  ExecResult submit_limit(const NewOrder& o) { return core.submit_limit(o); }
-  ExecResult submit_market(const NewOrder& o) { return core.submit_market(o); }
-  bool       cancel(OrderId id) { return core.cancel(id); }
-  ExecResult modify(const ModifyOrder& m) { return core.modify(m); }
+  py::list poll_trades() {
+    py::list t;
+    for (auto &d : logger.trades)
+      t.append(d);
+    logger.trades.clear();
+    return t;
+  }
+
+  ExecResult submit_limit(const NewOrder &o) { return core.submit_limit(o); }
+  ExecResult submit_market(const NewOrder &o) { return core.submit_market(o); }
+  bool cancel(OrderId id) { return core.cancel(id); }
+  ExecResult modify(const ModifyOrder &m) { return core.modify(m); }
 
   // L1 snapshot as dict
   py::dict l1() const {
@@ -32,19 +60,23 @@ struct PyBook {
     const Tick bb = bids.best_bid();
     const Tick ba = asks.best_ask();
 
-    auto qty_at = [](const IPriceLevels& side, Tick px) -> Quantity {
+    auto qty_at = [](const IPriceLevels &side, Tick px) -> Quantity {
       if (px == std::numeric_limits<Tick>::min() ||
           px == std::numeric_limits<Tick>::max()) {
         return 0;
       }
-      const LevelFIFO& L = const_cast<IPriceLevels&>(side).get_level(px);
+      const LevelFIFO &L = const_cast<IPriceLevels &>(side).get_level(px);
       return L.total_qty;
     };
 
-    d["best_bid_px"]  = (bb == std::numeric_limits<Tick>::min()) ? py::none() : py::cast(bb);
-    d["best_bid_qty"] = (bb == std::numeric_limits<Tick>::min()) ? 0 : qty_at(bids, bb);
-    d["best_ask_px"]  = (ba == std::numeric_limits<Tick>::max()) ? py::none() : py::cast(ba);
-    d["best_ask_qty"] = (ba == std::numeric_limits<Tick>::max()) ? 0 : qty_at(asks, ba);
+    d["best_bid_px"] =
+        (bb == std::numeric_limits<Tick>::min()) ? py::none() : py::cast(bb);
+    d["best_bid_qty"] =
+        (bb == std::numeric_limits<Tick>::min()) ? 0 : qty_at(bids, bb);
+    d["best_ask_px"] =
+        (ba == std::numeric_limits<Tick>::max()) ? py::none() : py::cast(ba);
+    d["best_ask_qty"] =
+        (ba == std::numeric_limits<Tick>::max()) ? 0 : qty_at(asks, ba);
     return d;
   }
 
@@ -53,20 +85,22 @@ struct PyBook {
     std::vector<std::pair<Tick, Quantity>> bid_levels;
     std::vector<std::pair<Tick, Quantity>> ask_levels;
 
-    bids.for_each_nonempty([&](Tick px, const LevelFIFO& L) {
+    bids.for_each_nonempty([&](Tick px, const LevelFIFO &L) {
       bid_levels.emplace_back(px, L.total_qty);
     });
-    asks.for_each_nonempty([&](Tick px, const LevelFIFO& L) {
+    asks.for_each_nonempty([&](Tick px, const LevelFIFO &L) {
       ask_levels.emplace_back(px, L.total_qty);
     });
 
     std::sort(bid_levels.begin(), bid_levels.end(),
-              [](auto& a, auto& b) { return a.first > b.first; });
+              [](auto &a, auto &b) { return a.first > b.first; });
     std::sort(ask_levels.begin(), ask_levels.end(),
-              [](auto& a, auto& b) { return a.first < b.first; });
+              [](auto &a, auto &b) { return a.first < b.first; });
 
-    if (static_cast<int>(bid_levels.size()) > depth) bid_levels.resize(depth);
-    if (static_cast<int>(ask_levels.size()) > depth) ask_levels.resize(depth);
+    if (static_cast<int>(bid_levels.size()) > depth)
+      bid_levels.resize(depth);
+    if (static_cast<int>(ask_levels.size()) > depth)
+      ask_levels.resize(depth);
 
     py::dict d;
     d["bids"] = bid_levels;
@@ -76,7 +110,7 @@ struct PyBook {
 };
 
 // Tiny replay helper: expose snapshot load for scripting
-py::tuple load_snapshot(const std::string& path) {
+py::tuple load_snapshot(const std::string &path) {
   PriceLevelsSparse bids, asks;
   SeqNo seq = 0;
   Timestamp ts = 0;
@@ -86,15 +120,13 @@ py::tuple load_snapshot(const std::string& path) {
 
 PYBIND11_MODULE(_lob, m) {
   // --- enums / constants ---
-  py::enum_<Side>(m, "Side")
-      .value("Bid", Side::Bid)
-      .value("Ask", Side::Ask);
+  py::enum_<Side>(m, "Side").value("Bid", Side::Bid).value("Ask", Side::Ask);
 
   // Expose bitmask flags as Python ints (cast to underlying type explicitly)
-  m.attr("IOC")       = py::int_(static_cast<uint32_t>(OrderFlags::IOC));
-  m.attr("FOK")       = py::int_(static_cast<uint32_t>(OrderFlags::FOK));
+  m.attr("IOC") = py::int_(static_cast<uint32_t>(OrderFlags::IOC));
+  m.attr("FOK") = py::int_(static_cast<uint32_t>(OrderFlags::FOK));
   m.attr("POST_ONLY") = py::int_(static_cast<uint32_t>(OrderFlags::POST_ONLY));
-  m.attr("STP")       = py::int_(static_cast<uint32_t>(OrderFlags::STP));
+  m.attr("STP") = py::int_(static_cast<uint32_t>(OrderFlags::STP));
 
   // --- data classes / PODs ---
   py::class_<NewOrder>(m, "NewOrder")
@@ -128,9 +160,11 @@ PYBIND11_MODULE(_lob, m) {
       .def("submit_market", &PyBook::submit_market)
       .def("cancel", &PyBook::cancel)
       .def("modify", &PyBook::modify)
+      .def("poll_trades", &PyBook::poll_trades)
       .def("l1", &PyBook::l1)
       .def("l2", &PyBook::l2, py::arg("depth") = 5);
 
   // --- helpers ---
-  m.def("load_snapshot", &load_snapshot, "Load snapshot and return (ok, seq, ts)");
+  m.def("load_snapshot", &load_snapshot,
+        "Load snapshot and return (ok, seq, ts)");
 }
