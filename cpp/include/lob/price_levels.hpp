@@ -174,3 +174,10 @@ private:
 };
 
 } // namespace lob
+
+// Factory functions — concrete PriceLevels<Side> not in public headers
+#include <memory>
+namespace lob {
+std::unique_ptr<IPriceLevels> make_bid_levels();
+std::unique_ptr<IPriceLevels> make_ask_levels();
+}  // namespace lob
