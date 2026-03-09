@@ -4,9 +4,9 @@
 
 namespace lob {
 std::unique_ptr<IPriceLevels> make_bid_levels() {
-    return std::make_unique<PriceLevels<Side::Bid>>();
+    return std::make_unique<PriceLevelsSparse>();
 }
 std::unique_ptr<IPriceLevels> make_ask_levels() {
-    return std::make_unique<PriceLevels<Side::Ask>>();
+    return std::make_unique<PriceLevelsSparse>();
 }
 }  // namespace lob
