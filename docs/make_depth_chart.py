@@ -67,7 +67,7 @@ def main() -> None:
     if not trades.empty:
         plt.scatter(trades_px.index, trades_px.values, s=6, label="Trades")
 
-    plt.title("BTCUSDT — Approx. Best Bid/Ask (from diffs)")
+    plt.title("BTCUSDT - Approx. Best Bid/Ask (from diffs)")
     plt.xlabel("Time (UTC)")
     plt.ylabel("Price")
     plt.legend(loc="best")

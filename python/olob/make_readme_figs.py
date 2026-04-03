@@ -17,7 +17,7 @@ def _ensure_dir(p: Path) -> None:
 
 def _read_agg(agg_csv: Path) -> pd.DataFrame:
     df = pd.read_csv(agg_csv)
-    # params is JSON in a CSV field — keep string but don’t explode
+    # params is JSON in a CSV field - keep string but don’t explode
     # coerce numeric fields if present
     for col in ["score", "pnl_total", "max_drawdown", "sharpe_like", "filled_qty", "fees"]:
         if col in df.columns:

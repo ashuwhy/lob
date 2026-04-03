@@ -175,7 +175,7 @@ private:
 
 } // namespace lob
 
-// Factory functions — concrete PriceLevels<Side> not in public headers
+// Factory functions - concrete PriceLevels<Side> not in public headers
 #include <memory>
 namespace lob {
 std::unique_ptr<IPriceLevels> make_bid_levels();

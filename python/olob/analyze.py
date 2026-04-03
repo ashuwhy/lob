@@ -151,7 +151,7 @@ def run_pipeline(
     if depth_path.exists():
         metrics_cmd += ["--depth-top10", str(depth_path)]
     else:
-        print(f"[info] depth file not found: {depth_path} — running metrics without L2 depth")
+        print(f"[info] depth file not found: {depth_path} - running metrics without L2 depth")
     _run(metrics_cmd)
 
     # 3b) microstructure (robust: do not fail the whole report if this errors)
@@ -206,7 +206,7 @@ def run_pipeline(
         "impact_clusters": _embed_png_b64(plots_dir / "impact_clusters.png"),
     }
 
-    title = f"{date} {symbol} — {hour_start}–{(dt.datetime.strptime(hour_start, '%H:%M') + dt.timedelta(hours=1)).strftime('%H:%M')} UTC"
+    title = f"{date} {symbol} - {hour_start}–{(dt.datetime.strptime(hour_start, '%H:%M') + dt.timedelta(hours=1)).strftime('%H:%M')} UTC"
     html = _render_html(
         title=title,
         exchange=exchange,
@@ -234,7 +234,7 @@ def _render_html(*, title: str, exchange: str, symbol: str, date: str, hour_star
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LOB Report — {title}</title>
+<title>LOB Report - {title}</title>
 <style>
 :root {{
   --bg: #0b0d10; --fg: #e8eef2; --muted:#9aa4ad; --card:#12161a; --accent:#6bc2ff;
@@ -260,7 +260,7 @@ hr{{border:0;border-top:1px solid #1c2228;margin:16px 0}}
 <body>
   <div class="header">
     <div>
-      <h1>LOB Report — {symbol}</h1>
+      <h1>LOB Report - {symbol}</h1>
       <div class="meta">{exchange} · {date} · Window: {hour_start}–{(dt.datetime.strptime(hour_start,'%H:%M') + dt.timedelta(hours=1)).strftime('%H:%M')} UTC</div>
     </div>
     <div><span class="badge">Self-contained HTML</span></div>

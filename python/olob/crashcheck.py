@@ -335,7 +335,7 @@ def run_crash_check(strategy_yaml: str,
                 return CrashCheckResult(False, ref_dir, partA_dir, partB_dir,
                                         "Could not find a data-driven interior cut with non-empty slices")
 
-    # --- Trades: optional — slice only if present and non-empty
+    # --- Trades: optional - slice only if present and non-empty
     tradesA = tradesB = None
     if trades_csv:
         t_in = Path(trades_csv)

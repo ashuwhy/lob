@@ -225,7 +225,7 @@ def load_depth_top10(parquet_path: str) -> pd.DataFrame:
         tidy = tidy.dropna(subset=["price","qty"])
         return tidy.sort_values(["ts_dt","side","level"]).reset_index(drop=True)
 
-    # If we reach here, we don't know the format—return empty
+    # If we reach here, we don't know the format-return empty
     return pd.DataFrame(columns=["ts_dt","side","level","price","qty"])
 
 # ---------------------------
@@ -469,7 +469,7 @@ with top2:
 if not pdf.empty:
     st.plotly_chart(figure_pnl(pdf, upto=cur_time), use_container_width=True)
 else:
-    st.info("PnL CSV not provided — set path and Load to see PnL & inventory.")
+    st.info("PnL CSV not provided - set path and Load to see PnL & inventory.")
 
 # Depth heatmap (optional)
 if not ddf.empty:

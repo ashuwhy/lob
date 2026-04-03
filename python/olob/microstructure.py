@@ -453,7 +453,7 @@ def main():
     fig1 = plt.figure(figsize=(10,5))
     plt.plot(parkinson_ann.index, parkinson_ann.values, label="Parkinson (ann.)")
     plt.plot(gk_ann.index, gk_ann.values, label="Garman–Klass (ann.)")
-    plt.title(f"Realized Volatility on Mid — bars={int(args.bar_sec)}s, window={args.rv_window}")
+    plt.title(f"Realized Volatility on Mid - bars={int(args.bar_sec)}s, window={args.rv_window}")
     plt.xlabel("Time"); plt.ylabel("Sigma (annualized)"); plt.legend()
     fig1.tight_layout(); fig1.savefig(plots_dir / "vol.png", dpi=150); plt.close(fig1)
 
@@ -463,7 +463,7 @@ def main():
         g = impact_results[H]["by_notional"]
         x = np.arange(len(g))
         plt.plot(x, g.values, marker="o", label=f"{H} ms")
-    plt.title("Impact Curve — Future Mid Move vs Trade Notional Buckets")
+    plt.title("Impact Curve - Future Mid Move vs Trade Notional Buckets")
     plt.xlabel("Notional buckets (deciles)"); plt.ylabel("Avg Δ mid (bp)"); plt.legend()
     if len(horizons_ms)>0:
         n = len(impact_results[horizons_ms[0]]["by_notional"])

@@ -1,4 +1,4 @@
-# Limit Order Book (LOB) Engine — C++20
+# Limit Order Book (LOB) Engine - C++20
 
 <!-- Core Project Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -198,8 +198,8 @@ See `docs/bench.md`, `docs/bench.csv`, and `docs/hist.csv` for reproducible resu
 - `ExecResult modify(const ModifyOrder&)`.
 
 **Ladders** (`include/lob/price_levels.hpp`)
-- `PriceLevelsContig(PriceBand)` — contiguous array for bounded tick ranges.  
-- `PriceLevelsSparse` — `unordered_map<Tick, LevelFIFO>` for unbounded ranges.  
+- `PriceLevelsContig(PriceBand)` - contiguous array for bounded tick ranges.  
+- `PriceLevelsSparse` - `unordered_map<Tick, LevelFIFO>` for unbounded ranges.  
 - Both expose `best_bid()/best_ask()` and **cache-hot** `best_level_ptr(Side)`.
 
 **Snapshots & logging** (`include/lob/logging.hpp`, `src/logging.cpp`)
@@ -514,11 +514,11 @@ python -m olob.microstructure \
 #### 📦 Generated artifacts
 
 **Figures (PNG)**  
-- `analytics/plots/vol.png` — Annualized Parkinson & Garman–Klass on mid.  
-- `analytics/plots/impact.png` — Impact curves: future mid (bp) vs size buckets.  
-- `analytics/plots/oflow_autocorr.png` — Signed trade autocorrelation by lag.  
-- `analytics/plots/drift_vs_imbalance.png` — Future drift (bp) by L1 imbalance decile.  
-- `analytics/plots/impact_clusters.png` — Cluster centroids of impact-curve shapes.  
+- `analytics/plots/vol.png` - Annualized Parkinson & Garman–Klass on mid.  
+- `analytics/plots/impact.png` - Impact curves: future mid (bp) vs size buckets.  
+- `analytics/plots/oflow_autocorr.png` - Signed trade autocorrelation by lag.  
+- `analytics/plots/drift_vs_imbalance.png` - Future drift (bp) by L1 imbalance decile.  
+- `analytics/plots/impact_clusters.png` - Cluster centroids of impact-curve shapes.  
 
 **Summary (JSON)**  
 - `analytics/microstructure_summary.json`  
@@ -575,7 +575,7 @@ lob analyze --exchange binanceus --symbol BTCUSDT \
 ---
 
 ### 🌐 Portability
-The HTML report is fully **self-contained** — just open it in any browser, no external files needed.
+The HTML report is fully **self-contained** - just open it in any browser, no external files needed.
 
 
 ## ✅ Performance & Analytics
@@ -631,7 +631,7 @@ lob analyze --exchange binanceus --symbol BTCUSDT \
 ```
 
 **Artifacts include**
-- `out/reports/2025-08-25_BTCUSDT.html` — self-contained HTML report.  
+- `out/reports/2025-08-25_BTCUSDT.html` - self-contained HTML report.  
 - Plots: `vol.png`, `impact.png`, `oflow_autocorr.png`, `drift_vs_imbalance.png`, `impact_clusters.png`.  
 - JSON summaries under `out/tmp_report/analytics/`.  
 
@@ -650,18 +650,18 @@ The repository includes a lightweight **strategy API** and backtester for parent
 
 ### 🔧 What it provides
 - **Strategy interface** with callbacks:  
-  - `on_tick` — per-quote updates.  
-  - `on_bar` — bar-close scheduling.  
-  - `on_fill` — feedback on executed clips.  
+  - `on_tick` - per-quote updates.  
+  - `on_bar` - bar-close scheduling.  
+  - `on_fill` - feedback on executed clips.  
 
 - **Schedulers**:  
-  - **TWAP** — evenly slices parent order across bars.  
-  - **VWAP** — weights slices by traded volume per bar (falls back to TWAP if trades missing).  
+  - **TWAP** - evenly slices parent order across bars.  
+  - **VWAP** - weights slices by traded volume per bar (falls back to TWAP if trades missing).  
 
 - **Execution controls**:  
-  - `min_clip` — smallest child order size.  
-  - `cooldown_ms` — minimum delay between clips.  
-  - `force_taker` — flag to choose market vs passive execution.  
+  - `min_clip` - smallest child order size.  
+  - `cooldown_ms` - minimum delay between clips.  
+  - `force_taker` - flag to choose market vs passive execution.  
 
 - **Cost model**:  
   - Tick/lot rounding.  
@@ -672,8 +672,8 @@ The repository includes a lightweight **strategy API** and backtester for parent
 
 ### 📤 Outputs
 The CLI produces:
-- `*_fills.csv` — detailed child fills (ts, px, qty, bar).  
-- `*_summary.json` — aggregate stats (filled_qty, avg_px, notional, fees, signed_cost, params).  
+- `*_fills.csv` - detailed child fills (ts, px, qty, bar).  
+- `*_summary.json` - aggregate stats (filled_qty, avg_px, notional, fees, signed_cost, params).  
 
 ---
 
@@ -710,11 +710,11 @@ The backtester now produces **PnL and risk statistics** alongside fills:
 ---
 
 ### 📦 Outputs per run
-- `*_fills.csv` — executed child orders.  
-- `*_summary.json` — execution summary.  
-- `pnl_timeseries.csv` — time series of cash, inventory, equity.  
-- `risk_summary.json` — aggregated PnL & risk stats.  
-- `checksums.sha256.json` — deterministic hash over all artifacts.  
+- `*_fills.csv` - executed child orders.  
+- `*_summary.json` - execution summary.  
+- `pnl_timeseries.csv` - time series of cash, inventory, equity.  
+- `risk_summary.json` - aggregated PnL & risk stats.  
+- `checksums.sha256.json` - deterministic hash over all artifacts.  
 
 ---
 
@@ -788,10 +788,10 @@ This ensures apples-to-apples comparison under identical market conditions.
 - **Iceberg**: successfully replenished hidden slices to achieve ~5 BTC filled.  
 
 Artifacts per run include:
-- `*_fills.csv` — all child orders executed  
-- `*_summary.json` — structured execution report  
-- `pnl_timeseries.csv`, `risk_summary.json` — equity + risk stats  
-- `checkums.sha256.json` — deterministic reproducibility  
+- `*_fills.csv` - all child orders executed  
+- `*_summary.json` - structured execution report  
+- `pnl_timeseries.csv`, `risk_summary.json` - equity + risk stats  
+- `checkums.sha256.json` - deterministic reproducibility  
 
 This proves **end-to-end functionality of the strategy API, cost model, and queue-aware execution loop**.
 
@@ -869,7 +869,7 @@ python -m olob.make_readme_figs --sweep-dir out/sweeps/acceptance
 
 ## 🎥 Minimal Live Visualization
 
-A major upgrade to this project is the **live visualization layer**. Instead of inspecting only static CSVs, I can now **see the market and strategy evolve in real time**. This bridges raw data with intuition — a key requirement for understanding trading algorithms.
+A major upgrade to this project is the **live visualization layer**. Instead of inspecting only static CSVs, I can now **see the market and strategy evolve in real time**. This bridges raw data with intuition - a key requirement for understanding trading algorithms.
 
 ---
 
@@ -982,13 +982,13 @@ lob snapshot-proof \
 
 ### 📂 Artifacts (`out/snapshot_proof/`)
 
-- **`snapshot.bin`** — the saved snapshot at the cut; consumed by `--snapshot-in`.  
-- **`.snap_tmp/`** — internal temp snapshot files (inspectable, can be deleted).  
-- **`events_tail.csv`** — tail slice (`ts_ns >= CUT_NS`).  
-- **`quotes_A.csv`** — L1 TAQ from single-pass replay.  
-- **`quotes_B.csv`** — L1 TAQ from resume replay.  
-- **`trades_A.bin`, `trades_B.bin`** — raw trade binaries (debug / analysis).  
-- **`equivalence.json`** — when backtesting, compares A vs B fills:  
+- **`snapshot.bin`** - the saved snapshot at the cut; consumed by `--snapshot-in`.  
+- **`.snap_tmp/`** - internal temp snapshot files (inspectable, can be deleted).  
+- **`events_tail.csv`** - tail slice (`ts_ns >= CUT_NS`).  
+- **`quotes_A.csv`** - L1 TAQ from single-pass replay.  
+- **`quotes_B.csv`** - L1 TAQ from resume replay.  
+- **`trades_A.bin`, `trades_B.bin`** - raw trade binaries (debug / analysis).  
+- **`equivalence.json`** - when backtesting, compares A vs B fills:  
   ```json
   {
     "ok": true,
@@ -1002,14 +1002,14 @@ lob snapshot-proof \
 
 ### 📊 Backtests (`out/snapshot_proof/bt/`)
 
-- **A/** — results on single-pass quotes.  
-  - `twap_fills.csv` — order-level fills used in equality checks.  
-  - `twap_summary.json` — slippage, avg cost, etc.  
-  - `risk_summary.json` — risk metrics (if enabled).  
-  - `pnl_timeseries.csv` — equity/PnL time series.  
-  - `checksums.sha256.json` — integrity hashes.  
+- **A/** - results on single-pass quotes.  
+  - `twap_fills.csv` - order-level fills used in equality checks.  
+  - `twap_summary.json` - slippage, avg cost, etc.  
+  - `risk_summary.json` - risk metrics (if enabled).  
+  - `pnl_timeseries.csv` - equity/PnL time series.  
+  - `checksums.sha256.json` - integrity hashes.  
 
-- **B/** — results on snapshot+resume quotes (same schema as A).  
+- **B/** - results on snapshot+resume quotes (same schema as A).  
 
 ✅ **Pass criteria**: A vs B fills and econ are identical (`equivalence.json: ok=true`).  
 If not, CLI exits non-zero with pointers to A/B artifacts.  
